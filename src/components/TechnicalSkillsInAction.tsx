@@ -1,30 +1,66 @@
 "use client";
-import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { Orbit, ShieldCheck, Zap, Activity } from 'lucide-react';
-import { motion } from 'framer-motion';
+
+import { useEffect, useState, useMemo } from "react";
+import { supabase } from "@/lib/supabase";
+import { motion } from "framer-motion";
+import { Orbit, ShieldCheck } from "lucide-react";
+import { Project, Skill, SkillCategory, CATEGORY_CONFIG } from "@/lib/constants";
+import StatusBadge from "@/components/StatusBadge";
+import SkillCategorySection from "@/components/SkillCategorySection";
+
+function groupSkills(skills: Skill[] = []) {
+  const grouped: Record<SkillCategory, Skill[]> = {
+    Language: [],
+    "Framework & Library": [],
+    "Tool & Platform": [],
+    "Engineering Competency": [],
+  };
+
+  skills.forEach((skill) => {
+    if (grouped[skill.category]) {
+      grouped[skill.category].push(skill);
+    }
+  });
+
+  return grouped;
+}
 
 export default function TechnicalSkillsInAction() {
-  const [projects, setProjects] = useState<any[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchTechnicalLogs() {
+    async function fetchProjects() {
       const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (data) setProjects(data);
+        .from("projects")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error(error);
+        setLoading(false);
+        return;
+      }
+
+      // Strong typing implemented
+      setProjects((data ?? []) as Project[]);
       setLoading(false);
     }
-    fetchTechnicalLogs();
+
+    fetchProjects();
   }, []);
+
+  // Performance optimization: Group skills only when projects data changes
+  const enhancedProjects = useMemo(() => {
+    return projects.map((project) => ({
+      ...project,
+      groupedSkills: groupSkills(project.skills),
+    }));
+  }, [projects]);
 
   if (loading) return <div className="min-h-screen bg-slate-950" />;
 
   return (
-    // Added id="technical-logs" for Hero button navigation
     <section id="technical-logs" className="py-24 px-6 md:px-20 bg-slate-950 scroll-mt-20">
       <div className="flex flex-col mb-16">
         <h2 className="text-xs font-mono text-slate-500 uppercase tracking-[0.4em] mb-4">
@@ -34,60 +70,69 @@ export default function TechnicalSkillsInAction() {
       </div>
 
       <div className="grid grid-cols-1 gap-12">
-        {projects.map((node, index) => (
-          <motion.div 
-            key={node.id}
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
+        {enhancedProjects.map((project, index) => (
+          <motion.div
+            key={project.id}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: index * 0.1 }}
-            className="group relative p-8 border border-slate-900 bg-slate-900/5 hover:bg-slate-900/10 transition-all rounded-sm"
+            transition={{ delay: index * 0.08 }}
+            className="relative rounded-sm border border-slate-900 bg-slate-900/5 p-8 hover:border-cyan-500/20 transition-all"
           >
-            {/* System Header */}
-            <div className="flex items-center gap-4 mb-10">
-              <div className="p-3 bg-slate-950 border border-slate-800 group-hover:border-cyan-500/50 transition-colors">
-                <Orbit className="text-cyan-400" size={20} />
+            {/* Visually balanced Header Layout */}
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-slate-950 border border-slate-800 shrink-0 mt-1">
+                <Orbit size={18} className="text-cyan-400" />
               </div>
-              <div>
-                <h3 className="text-xl font-bold text-slate-100 tracking-tight">{node.title}</h3>
-                <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mt-1 italic">
-                  {node.tagline}
+              <div className="flex flex-col items-start">
+                <h3 className="text-2xl font-bold text-slate-100">
+                  {project.title}
+                </h3>
+                <p className="mt-2 text-xs font-mono uppercase tracking-[0.2em] text-slate-500 mb-4">
+                  {project.tagline}
                 </p>
+                <StatusBadge status={project.status} />
               </div>
             </div>
 
-            {/* Dynamic Skills Mapping with Reasoning */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {node.skills?.map((skillObj: any, i: number) => (
-                <div key={i} className="relative pl-6 border-l border-slate-800 hover:border-cyan-500 transition-colors group/skill">
-                  <div className="absolute -left-[5px] top-0 h-2 w-2 rounded-full bg-slate-800 group-hover/skill:bg-cyan-500 transition-colors" />
-                  
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-[11px] font-mono font-bold text-cyan-400 uppercase tracking-tighter">
-                      {skillObj.name}
-                    </span>
-                    <Activity size={10} className="text-slate-700" />
-                  </div>
-
-                  <p className="text-[11px] text-slate-400 font-mono leading-relaxed italic">
-                    {`// ${skillObj.reason}`}
-                  </p>
-                </div>
+            {/* ===================== */}
+            {/* Technical Categories */}
+            {/* ===================== */}
+            <div className="mt-10 space-y-10">
+              {CATEGORY_CONFIG.map((category) => (
+                <SkillCategorySection
+                  key={category.key}
+                  title={category.title}
+                  icon={category.icon}
+                  skills={project.groupedSkills[category.key]}
+                />
               ))}
             </div>
 
-            {/* Bottom Engineering Logic */}
-            <div className="mt-12 pt-6 border-t border-slate-900/50">
-              <div className="flex items-center gap-2 mb-3">
-                <ShieldCheck size={14} className="text-violet-400" />
-                <span className="text-[9px] font-mono text-violet-400 uppercase tracking-[0.2em]">Engineering_Defense_Log</span>
+            {/* ===================== */}
+            {/* Engineering Defense Log */}
+            {/* ===================== */}
+            <div className="mt-12 pt-8 border-t border-slate-800">
+              <div className="flex items-center gap-2 mb-4">
+                <ShieldCheck size={15} className="text-violet-400" />
+                <h4 className="text-[10px] uppercase tracking-[0.25em] font-mono text-violet-400">
+                  Engineering Defense Log
+                </h4>
               </div>
-              <p className="text-xs text-slate-500 font-mono leading-relaxed max-w-4xl">
-                {node.solution}
+              <p className="text-sm text-slate-500 leading-relaxed max-w-5xl">
+                {project.solution}
               </p>
             </div>
           </motion.div>
         ))}
+
+        {projects.length === 0 && (
+          <div className="border border-dashed border-slate-800 rounded-sm py-20 text-center">
+            <p className="font-mono text-slate-600">
+              // NO_ACTIVE_PROJECTS_FOUND
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );
