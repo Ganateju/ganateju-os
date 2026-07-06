@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
-import { Brain, Terminal as TerminalIcon } from "lucide-react";
+import { Brain, Network } from "lucide-react";
 import { SkillCategory, Skill, CATEGORY_CONFIG } from "@/lib/constants";
 
 const ENGINEERING_PRINCIPLES = [
@@ -19,6 +19,7 @@ const ENGINEERING_PRINCIPLES = [
 
 export default function SkillsMatrix() {
   const [loading, setLoading] = useState(true);
+
   const [skills, setSkills] = useState<Record<SkillCategory, string[]>>({
     Language: [],
     "Framework & Library": [],
@@ -72,131 +73,111 @@ export default function SkillsMatrix() {
   if (loading) return <div className="min-h-[400px] bg-slate-950" />;
 
   return (
-    <section className="py-24 px-6 md:px-20 bg-[#050505]">
-      {/* Fake Terminal Window Wrapper */}
-      <div className="max-w-6xl mx-auto rounded-lg border border-slate-800 bg-[#0a0a0a] shadow-2xl overflow-hidden">
+    <section className="py-24 px-6 md:px-20 bg-[#020617] overflow-hidden relative">
+      
+      {/* Ambient Graph Background (Faint grid lines to sell the Node Graph vibe) */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20 pointer-events-none" />
+
+      <div className="flex flex-col mb-20 relative z-10">
+        <h2 className="text-xs font-mono text-slate-500 uppercase tracking-[0.4em] mb-4 flex items-center gap-2">
+          <Network size={14} className="text-cyan-500" />
+          [SECTION_03]: SYSTEM_TOPOLOGY_MAP
+        </h2>
+        <div className="h-[1px] w-full bg-gradient-to-r from-slate-800 to-transparent" />
+      </div>
+
+      {/* MASONRY LAYOUT: Keeps columns tightly packed, removing ugly blank spaces.
+      */}
+      <div className="columns-1 md:columns-2 xl:columns-3 gap-8 xl:gap-12 relative z-10">
         
-        {/* Terminal Header Bar */}
-        <div className="flex items-center justify-between px-4 py-2 border-b border-slate-800 bg-slate-900/50">
-          <div className="flex gap-2">
-            <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50" />
-            <div className="w-3 h-3 rounded-full bg-amber-500/20 border border-amber-500/50" />
-            <div className="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50" />
-          </div>
-          <p className="text-[10px] font-mono text-slate-500 flex items-center gap-2">
-            <TerminalIcon size={12} /> root@ganateju_os:~
-          </p>
-          <div className="w-12" /> {/* Spacer for centering */}
-        </div>
+        {CATEGORY_CONFIG.map((category, index) => (
+          <TopologyCluster
+            key={category.key}
+            title={category.title}
+            icon={category.icon}
+            skills={skills[category.key as SkillCategory]}
+            delay={index * 0.1}
+          />
+        ))}
 
-        {/* Terminal Body */}
-        <div className="p-6 md:p-10 font-mono text-xs md:text-sm">
-          
-          {/* CLI Input Simulation */}
-          <div className="mb-8 text-slate-300">
-            <span className="text-green-400">root@ganateju_os</span>:
-            <span className="text-blue-400">~/system</span>$ ./query_competencies.sh
-            <br />
-            <span className="text-slate-500 mt-2 inline-block">
-              [SYSTEM] Compiling active skill nodes...
-            </span>
-          </div>
+        <TopologyCluster
+          title="ENGINEERING_PRINCIPLES"
+          icon={<Brain size={16} />}
+          skills={ENGINEERING_PRINCIPLES}
+          accent="violet"
+          delay={0.4}
+        />
 
-          {/* OS Directory Tree Architecture */}
-          <div className="flex flex-col space-y-6">
-            
-            {/* Base Directory Node */}
-            <div className="text-cyan-400 font-bold mb-2">
-              ./competency_matrix/
-            </div>
-
-            {CATEGORY_CONFIG.map((category, index) => (
-              <TerminalTreeRow
-                key={category.key}
-                title={category.title}
-                icon={category.icon}
-                skills={skills[category.key as SkillCategory]}
-                isLast={false}
-                delay={index * 0.15}
-              />
-            ))}
-
-            <TerminalTreeRow
-              title="ENGINEERING_PRINCIPLES"
-              icon={<Brain size={14} />}
-              skills={ENGINEERING_PRINCIPLES}
-              isLast={true}
-              accent="violet"
-              delay={0.6}
-            />
-          </div>
-
-          {/* Awaiting Input Prompt */}
-          <div className="mt-12 flex items-center text-slate-300">
-            <span className="text-green-400">root@ganateju_os</span>:
-            <span className="text-blue-400">~/system</span>$ 
-            <span className="w-2.5 h-4 bg-slate-300 animate-pulse ml-2 inline-block align-middle" />
-          </div>
-
-        </div>
       </div>
     </section>
   );
 }
 
-function TerminalTreeRow({
+function TopologyCluster({
   title,
   icon,
   skills,
-  isLast,
   accent = "cyan",
   delay = 0,
 }: {
   title: string;
   icon: React.ReactNode;
   skills: string[];
-  isLast: boolean;
   accent?: "cyan" | "violet";
   delay?: number;
 }) {
   if (!skills || skills.length === 0) return null;
 
   const isViolet = accent === "violet";
+  const glowColor = isViolet ? "shadow-violet-500/20" : "shadow-cyan-500/20";
+  const borderColor = isViolet ? "border-violet-500/30" : "border-cyan-500/30";
   const textColor = isViolet ? "text-violet-400" : "text-cyan-400";
-  const hoverBg = isViolet ? "hover:bg-violet-400" : "hover:bg-cyan-400";
-  const marker = isLast ? "└──" : "├──";
-
+  const nodeBg = isViolet ? "bg-violet-500" : "bg-cyan-500";
+  
   return (
     <motion.div
-      initial={{ opacity: 0, x: -10 }}
-      whileInView={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.3, delay }}
-      className="relative flex flex-col group"
+      transition={{ duration: 0.5, delay }}
+      // break-inside-avoid ensures the cluster doesn't get sliced in half by the masonry layout
+      className="break-inside-avoid mb-10 inline-block w-full"
     >
-      {/* Folder / Category Name */}
-      <div className="flex items-center gap-2 text-slate-500">
-        <span className="shrink-0">{marker}</span>
-        <span className={textColor}>{icon}</span>
-        <span className={`font-bold tracking-widest uppercase ${textColor}`}>
+      {/* ROOT NODE (The Category Header) */}
+      <div className={`flex items-center gap-3 p-3 rounded-lg border ${borderColor} bg-slate-900/50 backdrop-blur-sm shadow-[0_0_15px_-3px] ${glowColor} w-max relative z-10`}>
+        <div className={textColor}>{icon}</div>
+        <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-slate-100 pr-2">
           {title}
-        </span>
+        </h3>
       </div>
 
-      {/* Skills Container (with continuous vertical line on the left if not last item) */}
-      <div className={`ml-1.5 pl-6 pt-3 pb-2 flex flex-wrap gap-2.5 ${!isLast ? 'border-l border-slate-800' : ''}`}>
-        {skills.map((skill, index) => (
-          <motion.span
-            key={skill}
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: delay + (index * 0.02), duration: 0.2 }}
-            className={`px-2 py-0.5 border border-slate-800 bg-[#0a0a0a] text-slate-400 text-[11px] transition-colors cursor-crosshair ${hoverBg} hover:text-black`}
-          >
-            {skill}
-          </motion.span> // FIXED TAG HERE
-        ))}
+      {/* THE CIRCUIT TRACE (Connecting lines from Root Node to Skills) */}
+      <div className="relative pl-6 pt-4 ml-6 border-l-2 border-slate-800/80">
+        
+        {/* Horizontal Connector branching off the main trunk */}
+        <div className="absolute top-0 left-[-2px] w-4 h-4 border-b-2 border-l-2 border-slate-800/80 rounded-bl-lg" />
+
+        {/* SKILLS CLUSTER (The End Nodes) */}
+        <div className="flex flex-wrap gap-3 relative z-10 pt-2">
+          {skills.map((skill, index) => (
+            <motion.div
+              key={skill}
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: delay + (index * 0.03), duration: 0.3 }}
+              className="group flex items-center gap-2 px-3 py-1.5 bg-slate-900/40 border border-slate-800/80 rounded-full hover:border-slate-600 transition-colors cursor-default"
+            >
+              {/* Individual Node Indicator (The dot) */}
+              <div className={`w-1.5 h-1.5 rounded-full ${nodeBg} transition-all duration-300 group-hover:shadow-[0_0_8px_1px] ${glowColor}`} />
+              
+              <span className="text-[11px] font-mono tracking-wide text-slate-400 group-hover:text-slate-200 transition-colors">
+                {skill}
+              </span>
+            </motion.div>
+          ))}
+        </div>
+
       </div>
     </motion.div>
   );
