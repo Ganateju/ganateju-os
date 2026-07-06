@@ -84,7 +84,11 @@ export default function SkillsMatrix() {
         <div className="h-[1px] w-full bg-gradient-to-r from-slate-800 to-transparent" />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      {/* 
+        MASONRY LAYOUT FIX: 
+        Uses CSS columns instead of CSS grid to allow independent card heights. 
+      */}
+      <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-5 gap-6">
         
         {CATEGORY_CONFIG.map(category => (
           <SkillBlock
@@ -120,13 +124,13 @@ function SkillBlock({
 }) {
   const border =
     accent === "violet"
-      ? "border-violet-500/20 bg-violet-500/5"
+      ? "border-violet-500/20 bg-violet-500/5 hover:border-violet-500/40"
       : "border-slate-900 bg-slate-900/10 hover:border-cyan-500/30";
 
   const text =
     accent === "violet"
-      ? "text-violet-300/80"
-      : "text-slate-500";
+      ? "text-violet-300/80 border-violet-500/20"
+      : "text-slate-400 border-slate-800";
 
   const iconColor =
     accent === "violet"
@@ -137,13 +141,18 @@ function SkillBlock({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
-      className={`p-6 border rounded-sm transition-all ${border}`}
+      viewport={{ once: true }}
+      /* 
+        break-inside-avoid prevents the card from being cut in half across columns
+        inline-block w-full ensures standard rendering behavior within CSS columns
+      */
+      className={`break-inside-avoid inline-block w-full mb-6 p-6 border rounded-sm transition-all ${border}`}
     >
       <div className="flex items-center gap-3 mb-6">
         <span className={iconColor}>
           {icon}
         </span>
-        <h3 className="text-[10px] font-bold uppercase tracking-tighter text-slate-200">
+        <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-200">
           {title}
         </h3>
       </div>
@@ -152,7 +161,7 @@ function SkillBlock({
         {skills.map(skill => (
           <span
             key={skill}
-            className={`px-2 py-1 border border-slate-800 bg-slate-950 text-[10px] font-mono tracking-wide ${text}`}
+            className={`px-2.5 py-1 border bg-slate-950 text-[10px] font-mono tracking-wide rounded-sm ${text} hover:text-slate-200 transition-colors cursor-default`}
           >
             {skill}
           </span>
