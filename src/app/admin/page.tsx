@@ -6,6 +6,20 @@ import {
   LogOut, Cpu, Zap, PenTool, Trash2, Plus
 } from 'lucide-react';
 
+export const SKILL_CATEGORIES = {
+  LANGUAGE: "Language",
+  FRAMEWORK: "Framework & Library",
+  TOOL: "Tool & Platform",
+  COMPETENCY: "Engineering Competency",
+} as const;
+
+const CATEGORY_COLORS: Record<string, string> = {
+  [SKILL_CATEGORIES.LANGUAGE]: "text-cyan-400 border-cyan-700/50 bg-cyan-950/30",
+  [SKILL_CATEGORIES.FRAMEWORK]: "text-violet-400 border-violet-700/50 bg-violet-950/30",
+  [SKILL_CATEGORIES.TOOL]: "text-amber-400 border-amber-700/50 bg-amber-950/30",
+  [SKILL_CATEGORIES.COMPETENCY]: "text-green-400 border-green-700/50 bg-green-950/30",
+};
+
 export default function AdminPage() {
   const [mounted, setMounted] = useState(false);
   const [session, setSession] = useState<any>(null);
@@ -24,8 +38,14 @@ export default function AdminPage() {
   const [solution, setSolution] = useState('');
   
   // NEW: Skill + Reasoning Builder State
-  const [skillsList, setSkillsList] = useState<{name: string, reason: string}[]>([]);
+  const [skillsList, setSkillsList] = useState<{
+    name: string;
+    category: string;
+    reason: string;
+  }[]>([]);
+  
   const [currentSkill, setCurrentSkill] = useState('');
+  const [currentCategory, setCurrentCategory] = useState<string>(SKILL_CATEGORIES.LANGUAGE);
   const [currentReason, setCurrentReason] = useState('');
 
   // Hobby Form State
@@ -53,11 +73,31 @@ export default function AdminPage() {
 
   // --- Skill Builder Logic ---
   const addSkillToBatch = () => {
-    if (currentSkill && currentReason) {
-      setSkillsList([...skillsList, { name: currentSkill, reason: currentReason }]);
-      setCurrentSkill('');
-      setCurrentReason('');
+    if (!currentSkill.trim() || !currentReason.trim()) return;
+
+    const normalizedSkill = currentSkill.trim().toLowerCase();
+    
+    const alreadyExists = skillsList.some(
+      skill => skill.name.trim().toLowerCase() === normalizedSkill
+    );
+
+    if (alreadyExists) {
+      alert("Skill already added.");
+      return;
     }
+
+    setSkillsList([
+      ...skillsList,
+      {
+        name: currentSkill.trim(),
+        category: currentCategory,
+        reason: currentReason.trim()
+      }
+    ]);
+
+    setCurrentSkill("");
+    setCurrentCategory(SKILL_CATEGORIES.LANGUAGE);
+    setCurrentReason("");
   };
 
   const removeSkillFromBatch = (index: number) => {
@@ -178,7 +218,21 @@ export default function AdminPage() {
                 <p className="text-[9px] text-violet-400 uppercase tracking-widest">// Skill_Reasoning_Builder</p>
                 <div className="flex flex-col gap-2">
                   <input value={currentSkill} onChange={(e) => setCurrentSkill(e.target.value)} placeholder="Skill (e.g. OpenCV)" className="bg-slate-950 border border-slate-800 p-2 text-xs outline-none" />
+                  
+                  <select
+                    value={currentCategory}
+                    onChange={(e) => setCurrentCategory(e.target.value)}
+                    className="bg-slate-950 border border-slate-800 p-2 text-xs outline-none"
+                  >
+                    {Object.values(SKILL_CATEGORIES).map(category => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+
                   <input value={currentReason} onChange={(e) => setCurrentReason(e.target.value)} placeholder="Reasoning (Where/How it was used)" className="bg-slate-950 border border-slate-800 p-2 text-xs outline-none" />
+                  
                   <button type="button" onClick={addSkillToBatch} className="w-full py-2 bg-violet-600/20 text-violet-400 border border-violet-500/30 text-[10px] uppercase hover:bg-violet-600 hover:text-white transition-all">
                     + Add_Skill_Node
                   </button>
@@ -188,7 +242,21 @@ export default function AdminPage() {
                 <div className="space-y-2 mt-4">
                   {skillsList.map((s, i) => (
                     <div key={i} className="flex justify-between items-center bg-slate-900 p-2 border border-slate-800 text-[10px]">
-                      <span className="truncate w-5/6"><b className="text-cyan-400">{s.name}:</b> {s.reason}</span>
+                      
+                      <div className="w-5/6 flex flex-col">
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <b className="text-cyan-400">
+                                {s.name}
+                            </b>
+                            <span className={`px-2 py-0.5 text-[8px] uppercase rounded border ${CATEGORY_COLORS[s.category] || "border-slate-700 text-slate-500"}`}>
+                                {s.category}
+                            </span>
+                        </div>
+                        <p className="text-slate-400 mt-1 truncate">
+                            {s.reason}
+                        </p>
+                      </div>
+
                       <button onClick={() => removeSkillFromBatch(i)} className="text-red-500"><Trash2 size={12}/></button>
                     </div>
                   ))}
