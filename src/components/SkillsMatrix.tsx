@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
-import { Brain, Network } from "lucide-react";
+import { Brain, Cpu, ArrowRight } from "lucide-react";
 import { SkillCategory, Skill, CATEGORY_CONFIG } from "@/lib/constants";
 
 const ENGINEERING_PRINCIPLES = [
@@ -19,6 +19,7 @@ const ENGINEERING_PRINCIPLES = [
 
 export default function SkillsMatrix() {
   const [loading, setLoading] = useState(true);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const [skills, setSkills] = useState<Record<SkillCategory, string[]>>({
     Language: [],
@@ -70,50 +71,67 @@ export default function SkillsMatrix() {
     fetchSkills();
   }, []);
 
-  if (loading) return <div className="min-h-[400px] bg-slate-950" />;
+  if (loading) return <div className="min-h-[400px] bg-[#050505]" />;
 
   return (
-    <section className="py-24 px-6 md:px-20 bg-[#020617] overflow-hidden relative">
+    <section className="py-24 bg-[#050505] overflow-hidden">
       
-      {/* Ambient Graph Background (Faint grid lines to sell the Node Graph vibe) */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20 pointer-events-none" />
-
-      <div className="flex flex-col mb-20 relative z-10">
-        <h2 className="text-xs font-mono text-slate-500 uppercase tracking-[0.4em] mb-4 flex items-center gap-2">
-          <Network size={14} className="text-cyan-500" />
-          [SECTION_03]: SYSTEM_TOPOLOGY_MAP
-        </h2>
+      {/* Section Header */}
+      <div className="px-6 md:px-20 flex flex-col mb-12">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xs font-mono text-slate-500 uppercase tracking-[0.4em] flex items-center gap-2">
+            <Cpu size={14} className="text-cyan-500" />
+            [SECTION_03]: SYSTEM_PIPELINE
+          </h2>
+          {/* Scroll Hint for Desktop Users */}
+          <div className="hidden md:flex items-center gap-2 text-[10px] text-slate-600 font-mono uppercase tracking-widest animate-pulse">
+            Scroll Track <ArrowRight size={12} />
+          </div>
+        </div>
         <div className="h-[1px] w-full bg-gradient-to-r from-slate-800 to-transparent" />
       </div>
 
-      {/* MASONRY LAYOUT: Keeps columns tightly packed, removing ugly blank spaces.
+      {/* 
+        HORIZONTAL TIMELINE CONTAINER
+        Uses snap scrolling and hides the default scrollbar for a native app feel.
       */}
-      <div className="columns-1 md:columns-2 xl:columns-3 gap-8 xl:gap-12 relative z-10">
+      <div 
+        ref={scrollRef}
+        className="relative w-full flex overflow-x-auto snap-x snap-mandatory px-6 md:px-20 pb-16 pt-10 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+      >
         
-        {CATEGORY_CONFIG.map((category, index) => (
-          <TopologyCluster
-            key={category.key}
-            title={category.title}
-            icon={category.icon}
-            skills={skills[category.key as SkillCategory]}
-            delay={index * 0.1}
-          />
-        ))}
+        {/* The Continuous Data Bus Line (The Timeline Axis) */}
+        <div className="absolute top-[58px] left-0 h-[1px] w-[200vw] bg-slate-800/80 z-0" />
 
-        <TopologyCluster
-          title="ENGINEERING_PRINCIPLES"
-          icon={<Brain size={16} />}
-          skills={ENGINEERING_PRINCIPLES}
-          accent="violet"
-          delay={0.4}
-        />
+        <div className="flex gap-8 lg:gap-12 relative z-10">
+          {CATEGORY_CONFIG.map((category, index) => (
+            <TimelineNode
+              key={category.key}
+              title={category.title}
+              icon={category.icon}
+              skills={skills[category.key as SkillCategory]}
+              delay={index * 0.15}
+            />
+          ))}
+
+          <TimelineNode
+            title="ENGINEERING_PRINCIPLES"
+            icon={<Brain size={16} />}
+            skills={ENGINEERING_PRINCIPLES}
+            accent="violet"
+            delay={0.6}
+          />
+          
+          {/* Empty spacer so the last item doesn't stick to the right edge */}
+          <div className="w-[10vw] shrink-0" />
+        </div>
 
       </div>
     </section>
   );
 }
 
-function TopologyCluster({
+function TimelineNode({
   title,
   icon,
   skills,
@@ -129,52 +147,54 @@ function TopologyCluster({
   if (!skills || skills.length === 0) return null;
 
   const isViolet = accent === "violet";
-  const glowColor = isViolet ? "shadow-violet-500/20" : "shadow-cyan-500/20";
-  const borderColor = isViolet ? "border-violet-500/30" : "border-cyan-500/30";
-  const textColor = isViolet ? "text-violet-400" : "text-cyan-400";
+  const glowColor = isViolet ? "shadow-violet-500/30" : "shadow-cyan-500/30";
   const nodeBg = isViolet ? "bg-violet-500" : "bg-cyan-500";
-  
+  const textColor = isViolet ? "text-violet-400" : "text-cyan-400";
+  const panelBorder = isViolet ? "border-violet-500/30" : "border-cyan-500/30";
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
+      viewport={{ once: true, margin: "-20px" }}
       transition={{ duration: 0.5, delay }}
-      // break-inside-avoid ensures the cluster doesn't get sliced in half by the masonry layout
-      className="break-inside-avoid mb-10 inline-block w-full"
+      className="shrink-0 w-[85vw] sm:w-[350px] lg:w-[400px] snap-center flex flex-col items-start relative group"
     >
-      {/* ROOT NODE (The Category Header) */}
-      <div className={`flex items-center gap-3 p-3 rounded-lg border ${borderColor} bg-slate-900/50 backdrop-blur-sm shadow-[0_0_15px_-3px] ${glowColor} w-max relative z-10`}>
-        <div className={textColor}>{icon}</div>
-        <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-slate-100 pr-2">
-          {title}
-        </h3>
+      
+      {/* TIMELINE CONNECTION NODE */}
+      <div className="flex flex-col items-center ml-8 mb-6 relative">
+        {/* The glowing dot on the timeline axis */}
+        <div className={`w-3 h-3 rounded-full ${nodeBg} shadow-[0_0_12px_2px] ${glowColor} transition-transform duration-300 group-hover:scale-125`} />
+        {/* The vertical pipe dropping down to the panel */}
+        <div className="w-[1px] h-6 bg-slate-700 group-hover:bg-slate-500 transition-colors" />
       </div>
 
-      {/* THE CIRCUIT TRACE (Connecting lines from Root Node to Skills) */}
-      <div className="relative pl-6 pt-4 ml-6 border-l-2 border-slate-800/80">
+      {/* THE DATA PANEL */}
+      <div className={`w-full p-6 bg-[#0a0a0a] border ${panelBorder} rounded-xl shadow-xl transition-colors duration-500 group-hover:bg-[#0c0c0c]`}>
         
-        {/* Horizontal Connector branching off the main trunk */}
-        <div className="absolute top-0 left-[-2px] w-4 h-4 border-b-2 border-l-2 border-slate-800/80 rounded-bl-lg" />
+        {/* Panel Header */}
+        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-800">
+          <div className={`p-2 rounded-lg bg-slate-950 border border-slate-800 ${textColor}`}>
+            {icon}
+          </div>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-slate-200">
+            {title}
+          </h3>
+        </div>
 
-        {/* SKILLS CLUSTER (The End Nodes) */}
-        <div className="flex flex-wrap gap-3 relative z-10 pt-2">
+        {/* Skills Layout */}
+        <div className="flex flex-wrap gap-2.5">
           {skills.map((skill, index) => (
-            <motion.div
+            <motion.span
               key={skill}
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: delay + (index * 0.03), duration: 0.3 }}
-              className="group flex items-center gap-2 px-3 py-1.5 bg-slate-900/40 border border-slate-800/80 rounded-full hover:border-slate-600 transition-colors cursor-default"
+              transition={{ delay: delay + 0.2 + (index * 0.03), duration: 0.3 }}
+              className={`px-3 py-1.5 border border-slate-800 bg-slate-950/50 text-[11px] font-mono tracking-wide text-slate-400 rounded-md cursor-default transition-all duration-300 ${isViolet ? 'hover:text-violet-200 hover:border-violet-500/50' : 'hover:text-cyan-200 hover:border-cyan-500/50'}`}
             >
-              {/* Individual Node Indicator (The dot) */}
-              <div className={`w-1.5 h-1.5 rounded-full ${nodeBg} transition-all duration-300 group-hover:shadow-[0_0_8px_1px] ${glowColor}`} />
-              
-              <span className="text-[11px] font-mono tracking-wide text-slate-400 group-hover:text-slate-200 transition-colors">
-                {skill}
-              </span>
-            </motion.div>
+              {skill}
+            </motion.span>
           ))}
         </div>
 
