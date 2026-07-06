@@ -85,11 +85,10 @@ export default function SkillsMatrix() {
       </div>
 
       {/* 
-        THE FIX: 
-        Back to 'grid', which spreads them left-to-right.
-        Added 'items-start' so the short cards don't stretch vertically to match the tallest one! 
+        THE FIX: Changed to max 3 columns (lg:grid-cols-3). 
+        This gives tags room to breathe horizontally, balancing the heights perfectly.
       */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
         
         {CATEGORY_CONFIG.map(category => (
           <SkillBlock
@@ -123,42 +122,46 @@ function SkillBlock({
   skills: string[];
   accent?: "cyan" | "violet";
 }) {
+  // Enhanced, premium card aesthetics
   const border =
     accent === "violet"
-      ? "border-violet-500/20 bg-violet-500/5 hover:border-violet-500/40"
-      : "border-slate-900 bg-slate-900/10 hover:border-cyan-500/30";
-
-  const text =
-    accent === "violet"
-      ? "text-violet-300/80 border-violet-500/20"
-      : "text-slate-400 border-slate-800";
+      ? "border-violet-900/40 bg-violet-950/10 hover:border-violet-500/40 hover:bg-violet-950/20"
+      : "border-slate-800/60 bg-slate-900/20 hover:border-cyan-500/30 hover:bg-slate-900/40";
 
   const iconColor =
     accent === "violet"
       ? "text-violet-400"
       : "text-cyan-400";
 
+  // Sleeker, more interactive pill styles
+  const pillStyle = 
+    accent === "violet"
+      ? "bg-violet-950/40 border-violet-900/50 text-violet-300 hover:bg-violet-900/60 hover:border-violet-400/50 hover:text-violet-100"
+      : "bg-slate-950/50 border-slate-800/80 text-slate-400 hover:bg-slate-900 hover:border-cyan-500/50 hover:text-cyan-300";
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className={`p-6 border rounded-sm transition-all w-full ${border}`}
+      className={`p-7 border rounded-2xl transition-all duration-300 w-full shadow-lg shadow-black/20 ${border}`}
     >
-      <div className="flex items-center gap-3 mb-6">
+      {/* Header separated by a subtle border line */}
+      <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-800/50">
         <span className={iconColor}>
           {icon}
         </span>
-        <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-200">
+        <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-200">
           {title}
         </h3>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      {/* Skills map wrapping horizontally */}
+      <div className="flex flex-wrap gap-2.5">
         {skills.map(skill => (
           <span
             key={skill}
-            className={`px-2.5 py-1 border bg-slate-950 text-[10px] font-mono tracking-wide rounded-sm ${text} hover:text-slate-200 transition-colors cursor-default`}
+            className={`px-3 py-1.5 border text-[11px] font-mono tracking-wide rounded-md transition-all duration-300 cursor-default shadow-sm ${pillStyle}`}
           >
             {skill}
           </span>
