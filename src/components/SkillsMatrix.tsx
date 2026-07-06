@@ -77,7 +77,7 @@ export default function SkillsMatrix() {
 
   return (
     <section className="py-24 px-6 md:px-20 bg-slate-950">
-      <div className="flex flex-col mb-16">
+      <div className="flex flex-col mb-20">
         <h2 className="text-xs font-mono text-slate-500 uppercase tracking-[0.4em] mb-4">
           [SECTION_03]: TECHNICAL_COMPETENCY_MATRIX
         </h2>
@@ -85,25 +85,30 @@ export default function SkillsMatrix() {
       </div>
 
       {/* 
-        THE FIX: Changed to max 3 columns (lg:grid-cols-3). 
-        This gives tags room to breathe horizontally, balancing the heights perfectly.
+        THE LEDGER ARCHITECTURE: 
+        A clean, vertical stack of horizontal rows. 
+        Scales infinitely without ever creating awkward empty gaps.
       */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+      <div className="flex flex-col gap-12 lg:gap-16">
         
-        {CATEGORY_CONFIG.map(category => (
-          <SkillBlock
+        {CATEGORY_CONFIG.map((category, index) => (
+          <SkillRow
             key={category.key}
             title={category.title}
             icon={category.icon}
             skills={skills[category.key as SkillCategory]}
+            delay={index * 0.1}
           />
         ))}
 
-        <SkillBlock
+        <div className="w-full h-[1px] bg-slate-900 my-4" /> {/* Subtle separator */}
+
+        <SkillRow
           title="ENGINEERING_PRINCIPLES"
           icon={<Brain size={18} />}
           skills={ENGINEERING_PRINCIPLES}
           accent="violet"
+          delay={0.4}
         />
 
       </div>
@@ -111,57 +116,53 @@ export default function SkillsMatrix() {
   );
 }
 
-function SkillBlock({
+function SkillRow({
   title,
   icon,
   skills,
   accent = "cyan",
+  delay = 0,
 }: {
   title: string;
   icon: React.ReactNode;
   skills: string[];
   accent?: "cyan" | "violet";
+  delay?: number;
 }) {
-  // Enhanced, premium card aesthetics
-  const border =
-    accent === "violet"
-      ? "border-violet-900/40 bg-violet-950/10 hover:border-violet-500/40 hover:bg-violet-950/20"
-      : "border-slate-800/60 bg-slate-900/20 hover:border-cyan-500/30 hover:bg-slate-900/40";
+  if (!skills || skills.length === 0) return null;
 
-  const iconColor =
-    accent === "violet"
-      ? "text-violet-400"
-      : "text-cyan-400";
-
-  // Sleeker, more interactive pill styles
-  const pillStyle = 
-    accent === "violet"
-      ? "bg-violet-950/40 border-violet-900/50 text-violet-300 hover:bg-violet-900/60 hover:border-violet-400/50 hover:text-violet-100"
-      : "bg-slate-950/50 border-slate-800/80 text-slate-400 hover:bg-slate-900 hover:border-cyan-500/50 hover:text-cyan-300";
+  const iconColor = accent === "violet" ? "text-violet-400" : "text-cyan-400";
+  
+  const pillStyle = accent === "violet"
+    ? "bg-violet-950/20 border-violet-900/40 text-violet-300 hover:bg-violet-900/40 hover:border-violet-500/50 hover:text-violet-100 hover:shadow-[0_0_15px_-3px_rgba(139,92,246,0.2)]"
+    : "bg-slate-900/30 border-slate-800/60 text-slate-400 hover:bg-slate-800/60 hover:border-cyan-500/40 hover:text-cyan-300 hover:shadow-[0_0_15px_-3px_rgba(6,182,212,0.15)]";
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      className={`p-7 border rounded-2xl transition-all duration-300 w-full shadow-lg shadow-black/20 ${border}`}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ delay, duration: 0.4 }}
+      className="flex flex-col lg:flex-row gap-6 lg:gap-12 group"
     >
-      {/* Header separated by a subtle border line */}
-      <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-800/50">
-        <span className={iconColor}>
-          {icon}
-        </span>
-        <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-200">
-          {title}
-        </h3>
+      {/* LEFT COLUMN: Category Header (Fixed width on large screens) */}
+      <div className="lg:w-64 shrink-0 flex items-start pt-1">
+        <div className="flex items-center gap-3 lg:sticky lg:top-24">
+          <div className={`p-2 rounded-md bg-slate-900/50 border border-slate-800 transition-colors duration-500 group-hover:border-${accent}-500/30`}>
+            <span className={iconColor}>{icon}</span>
+          </div>
+          <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-200">
+            {title}
+          </h3>
+        </div>
       </div>
 
-      {/* Skills map wrapping horizontally */}
-      <div className="flex flex-wrap gap-2.5">
+      {/* RIGHT COLUMN: Skills Cloud */}
+      <div className="flex-1 flex flex-wrap gap-3">
         {skills.map(skill => (
           <span
             key={skill}
-            className={`px-3 py-1.5 border text-[11px] font-mono tracking-wide rounded-md transition-all duration-300 cursor-default shadow-sm ${pillStyle}`}
+            className={`px-3.5 py-1.5 border text-[11px] font-mono tracking-wide rounded-md transition-all duration-300 cursor-default ${pillStyle}`}
           >
             {skill}
           </span>
