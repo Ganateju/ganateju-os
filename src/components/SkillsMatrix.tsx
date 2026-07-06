@@ -136,9 +136,9 @@ export default function SkillsMatrix() {
         ))}
 
         <SkillBlock
-          title="Engineering_Method"
+          title="ENGINEERING_PRINCIPLES"
           icon={<Brain size={18} />}
-          skills={ENGINEERING_METHOD}
+          skills={ENGINEERING_PRINCIPLES}
           accent="violet"
         />
 
