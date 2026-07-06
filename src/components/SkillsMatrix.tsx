@@ -3,25 +3,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
-import {
-  Brain,
-  Code2,
-  Boxes,
-  Wrench,
-  Cpu
-} from "lucide-react";
-
-type SkillCategory =
-  | "Language"
-  | "Framework & Library"
-  | "Tool & Platform"
-  | "Engineering Competency";
-
-type Skill = {
-  name: string;
-  category: SkillCategory;
-  reason: string;
-};
+import { Brain } from "lucide-react";
+import { SkillCategory, Skill, CATEGORY_CONFIG } from "@/lib/constants";
 
 const ENGINEERING_PRINCIPLES = [
   "Systems Thinking",
@@ -33,29 +16,6 @@ const ENGINEERING_PRINCIPLES = [
   "Peer Leadership",
   "Self-directed Learning"
 ];
-
-const CATEGORY_CONFIG = [
-  {
-    key: "Language",
-    title: "Languages",
-    icon: <Code2 size={18} />
-  },
-  {
-    key: "Framework & Library",
-    title: "Frameworks_&_Libraries",
-    icon: <Boxes size={18} />
-  },
-  {
-    key: "Tool & Platform",
-    title: "Tools_&_Platforms",
-    icon: <Wrench size={18} />
-  },
-  {
-    key: "Engineering Competency",
-    title: "Engineering_Competencies",
-    icon: <Cpu size={18} />
-  }
-] as const;
 
 export default function SkillsMatrix() {
   const [loading, setLoading] = useState(true);
