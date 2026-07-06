@@ -73,7 +73,7 @@ export default function ContactTerminal() {
           <div className="absolute top-0 left-0 w-1 h-full bg-cyan-500" />
           <div className="flex items-center gap-3 mb-4 text-cyan-400">
             <Terminal size={18} />
-            <span className="text-[10px] font-mono uppercase tracking-[0.3em]">>_ ENGINEERING_DIRECTIVE</span>
+            <span className="text-[10px] font-mono uppercase tracking-[0.3em]">ENGINEERING_DIRECTIVE</span>
           </div>
           <p className="text-sm text-slate-400 font-mono leading-relaxed italic">
             {`> > "I build systems that begin with constraints, not assumptions.
