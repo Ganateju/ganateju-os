@@ -29,7 +29,7 @@ export default function Hero() {
         <div className="flex items-center gap-2 mb-4">
           <span className="h-[1px] w-12 bg-violet-500"></span>
           <span className="text-violet-400 font-mono text-sm tracking-widest uppercase">
-            Specializing in AIML & ECE 
+            SYSTEMS • AI • PERFORMANCE • AUTONOMY 
           </span>
         </div>
 
@@ -41,10 +41,13 @@ export default function Hero() {
         </h1>
 
         <p className="max-w-xl text-slate-400 text-lg md:text-xl mb-10 leading-relaxed">
-          Where <span className="text-cyan-400 border-b border-cyan-400/30">Hardware</span> Meets 
-          <span className="text-violet-400 italic"> Adaptive Intelligence</span>. 
-          Designing systems like <span className="text-slate-200">AeroToroid</span> to bridge physical constraints with neural potential. 
-        </p>
+  Designing intelligent systems across
+  <span className="text-cyan-400 border-b border-cyan-400/30"> software</span>,
+  <span className="text-violet-400 italic"> AI</span> and
+  <span className="text-slate-200"> autonomous platforms</span>,
+  with a focus on building scalable, deployable and
+  <span className="text-cyan-400 border-b border-cyan-400/30"> performance-driven</span> solutions.
+</p>
 
         <div className="flex flex-wrap gap-4">
           <button 
@@ -66,9 +69,9 @@ export default function Hero() {
 
       {/* SYSTEM STATS FOOTER */}
       <div className="absolute bottom-20 right-20 hidden lg:block z-10 font-mono text-[10px] text-slate-600 border-l border-slate-800 pl-4">
-        <p>// 100M_PR: 10.2s</p>
-        <p>// STATUS: OPEN_TO_ALL_ROLES</p>
-        <p>// LOCATION: VFSTR_OFF_CAMPUS </p>
+        <p>// STATUS: OPEN_TO_ALL_ROLES </p>
+             <p>// FOCUS: AI_SYSTEMS </p>
+             <p>// MODE: BUILDING</p>
       </div>
     </section>
   );
