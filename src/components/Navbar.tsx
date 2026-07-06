@@ -22,7 +22,7 @@ export default function Navbar() {
     const link = document.createElement('a');
     // Ensure your PDF is named exactly 'Ganateju_Resume.pdf' in your public folder
     link.href = '/Ganateju_Resume.pdf'; 
-    link.download = 'Ganateju_Pothuganti_CV.pdf';
+    link.download = 'Ganateju_Resume_SystemsEngineer.pdf';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
