@@ -35,6 +35,7 @@ export default function AdminPage() {
   // Project Form State
   const [title, setTitle] = useState('');
   const [tagline, setTagline] = useState('');
+  const [status, setStatus] = useState('Live Application'); // NEW: Status State
   const [solution, setSolution] = useState('');
   
   // NEW: Skill + Reasoning Builder State
@@ -126,12 +127,12 @@ export default function AdminPage() {
     }
 
     const { error } = await supabase.from('projects').insert([{ 
-      title, tagline, solution, skills: skillsList 
+      title, tagline, status, solution, skills: skillsList // NEW: Added status to insert payload
     }]);
 
     if (!error) {
       alert("SYSTEM_UPDATE: Technical records synchronized.");
-      setTitle(''); setTagline(''); setSolution(''); setSkillsList([]);
+      setTitle(''); setTagline(''); setStatus('Live Application'); setSolution(''); setSkillsList([]);
       fetchData();
     } else {
       alert("UPLOAD_FAILED: Check if you updated your DB column to JSONB.");
@@ -210,9 +211,23 @@ export default function AdminPage() {
               <h2 className="text-xs text-cyan-400 uppercase tracking-widest flex items-center gap-2">
                 <Cpu size={14} /> // Project_Engineering_Init
               </h2>
+              
               <input value={title} onChange={(e) => setTitle(e.target.value)} className="w-full bg-slate-950 border border-slate-800 p-3 text-sm outline-none" placeholder="Project Title" />
               <input value={tagline} onChange={(e) => setTagline(e.target.value)} className="w-full bg-slate-950 border border-slate-800 p-3 text-sm outline-none" placeholder="Tagline" />
               
+              {/* NEW: Project Status Dropdown */}
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                className="w-full bg-slate-950 border border-slate-800 p-3 text-sm outline-none text-slate-300"
+              >
+                <option value="Patent Preparation">Patent Preparation</option>
+                <option value="Functional MVP">Functional MVP</option>
+                <option value="Live Application">Live Application</option>
+                <option value="Validated">Validated</option>
+                <option value="Research Project">Research Project</option>
+              </select>
+
               {/* SKILL BUILDER UI */}
               <div className="p-4 border border-slate-800 bg-slate-950/50 space-y-4">
                 <p className="text-[9px] text-violet-400 uppercase tracking-widest">// Skill_Reasoning_Builder</p>
@@ -222,7 +237,7 @@ export default function AdminPage() {
                   <select
                     value={currentCategory}
                     onChange={(e) => setCurrentCategory(e.target.value)}
-                    className="bg-slate-950 border border-slate-800 p-2 text-xs outline-none"
+                    className="bg-slate-950 border border-slate-800 p-2 text-xs outline-none text-slate-300"
                   >
                     {Object.values(SKILL_CATEGORIES).map(category => (
                       <option key={category} value={category}>
