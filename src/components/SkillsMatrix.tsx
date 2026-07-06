@@ -192,11 +192,10 @@ function TerminalTreeRow({
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: delay + (index * 0.02), duration: 0.2 }}
-            // Classic Terminal Hover: Background becomes solid, text turns to pitch black
             className={`px-2 py-0.5 border border-slate-800 bg-[#0a0a0a] text-slate-400 text-[11px] transition-colors cursor-crosshair ${hoverBg} hover:text-black`}
           >
             {skill}
-          </motion.div>
+          </motion.span> // FIXED TAG HERE
         ))}
       </div>
     </motion.div>
