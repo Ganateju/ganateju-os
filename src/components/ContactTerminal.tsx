@@ -76,7 +76,8 @@ export default function ContactTerminal() {
             <span className="text-[10px] font-mono uppercase tracking-[0.3em]">System_Status: Adaptive_Engagement</span>
           </div>
           <p className="text-sm text-slate-400 font-mono leading-relaxed italic">
-            {`> "I am currently open to diverse roles across the engineering spectrum. Whether it's Core ECE, AIML Research, Systems Architecture, or Physical Performance optimization—I am ready to deploy my logic to solve high-impact constraints."`}
+            {`> > "I build systems that begin with constraints, not assumptions.
+Whether the challenge involves software, AI, autonomous platforms or performance engineering, my goal remains the same: understand the problem deeply, engineer practical solutions, and continuously improve through measurement."`}
           </p>
         </motion.div>
       </div>
