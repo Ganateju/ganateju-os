@@ -48,9 +48,9 @@ export default function SkillsMatrix() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <SkillBlock title="Intelligence_Node" icon={<Binary size={18}/>} skills={chunk1} />
+        <SkillBlock title="Intelligent_Systems" icon={<Binary size={18}/>} skills={chunk1} />
         <SkillBlock title="Systems_Architect" icon={<Layers size={18}/>} skills={chunk2} />
-        <SkillBlock title="Hardware_Logic" icon={<Cpu size={18}/>} skills={chunk3} />
+        <SkillBlock title="Software_Engineering" icon={<Cpu size={18}/>} skills={chunk3} />
 
         {/* Hardcoded Personality Block */}
         <motion.div 
@@ -61,7 +61,7 @@ export default function SkillsMatrix() {
           <div className="flex items-center gap-3 mb-6">
             <Brain className="text-violet-400" size={18} />
             <h3 className="text-[10px] font-bold text-slate-200 uppercase tracking-tighter">
-              Personality_&_Philosophy
+              Engineering_Method
             </h3>
           </div>
           <div className="flex flex-wrap gap-2">
