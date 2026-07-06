@@ -85,10 +85,11 @@ export default function SkillsMatrix() {
       </div>
 
       {/* 
-        MASONRY LAYOUT FIX: 
-        Uses CSS columns instead of CSS grid to allow independent card heights. 
+        THE FIX: 
+        Back to 'grid', which spreads them left-to-right.
+        Added 'items-start' so the short cards don't stretch vertically to match the tallest one! 
       */}
-      <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-5 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 items-start">
         
         {CATEGORY_CONFIG.map(category => (
           <SkillBlock
@@ -142,11 +143,7 @@ function SkillBlock({
       initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      /* 
-        break-inside-avoid prevents the card from being cut in half across columns
-        inline-block w-full ensures standard rendering behavior within CSS columns
-      */
-      className={`break-inside-avoid inline-block w-full mb-6 p-6 border rounded-sm transition-all ${border}`}
+      className={`p-6 border rounded-sm transition-all w-full ${border}`}
     >
       <div className="flex items-center gap-3 mb-6">
         <span className={iconColor}>
